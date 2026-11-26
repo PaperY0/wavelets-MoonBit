@@ -1,0 +1,16 @@
+.DS_Store
+_build/
+target/
+target
+.mooncakes/
+.moonagent/
+trace.json
+# 差分对拍/生成器用的本地 Python 依赖（pip --target 安装，可用 requirements.txt 重建）
+tools/ref/pylibs/
+__pycache__/
+*.pyc
+# 编译/测试日志
+check.log
+test.log
+*.coverage
+uncovered.log
