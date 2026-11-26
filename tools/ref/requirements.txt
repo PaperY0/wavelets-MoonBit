@@ -1,0 +1,5 @@
+# PyWavelets reference implementation for golden-data generation and differential testing.
+# Install locally (does NOT touch the global environment):
+#   python -m pip install --target tools/ref/pylibs -r tools/ref/requirements.txt
+PyWavelets==1.8.0
+numpy==2.5.5
