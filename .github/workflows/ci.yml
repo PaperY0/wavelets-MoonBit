@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # check / build / test 三件套，跨三个后端；工具链版本由 .moonbit-version 固定。
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [wasm, wasm-gc, js]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- "$(cat .moonbit-version)"
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Versions
+        run: moon version --all
+
+      - name: Format check
+        run: moon fmt --check
+
+      - name: Check
+        run: moon check
+
+      - name: Build
+        run: moon build --target ${{ matrix.target }}
+
+      - name: Test (${{ matrix.target }})
+        run: moon test --target ${{ matrix.target }}
+
+      - name: CLI smoke test (${{ matrix.target }})
+        run: |
+          moon run --target ${{ matrix.target }} cmd/main -- dwt db2 symmetric 1 2 3 4 5 6 7 8 > cli.json
+          python3 -c 'import json; d=json.load(open("cli.json")); assert len(d["cA"])==5 and len(d["cD"])==5'
+
+      - name: Runnable examples (${{ matrix.target }})
+        run: |
+          moon run --target ${{ matrix.target }} examples/denoise | grep -q "improved    = true"
+          moon run --target ${{ matrix.target }} examples/cwt_timefreq | grep -q "scale 1"
+
+  # moon info / fmt 必须是无操作，否则说明 .mbti 或格式忘了更新。
+  interface:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- "$(cat .moonbit-version)"
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+      - name: moon info + fmt (must be a no-op)
+        run: |
+          moon info
+          moon fmt
+          git diff --exit-code -- '*.mbti' '*.mbt'
+
+  # 端到端差分：CLI 对本地 PyWavelets 1.8.0 逐用例对拍。
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- "$(cat .moonbit-version)"
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+      - name: Install reference PyWavelets (local, isolated)
+        run: python -m pip install --target tools/ref/pylibs -r tools/ref/requirements.txt
+      - name: Differential comparison against upstream
+        run: python tools/diff_test.py

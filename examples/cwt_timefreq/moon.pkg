@@ -1,0 +1,6 @@
+import {
+  "PaperY0/wavelets" @lib,
+  "moonbitlang/core/math",
+}
+
+pkgtype(kind: "executable")

@@ -5,6 +5,7 @@
 > 小波函数/尺度函数 + 阈值化 + 9 种信号延拓模式**，内置 **106 个离散小波 + 10 个实值连续小波**。
 > 纯计算、无 IO，`wasm` / `wasm-gc` / `js` 三后端可用。
 
+[![CI](https://github.com/PaperY0/wavelets-MoonBit/actions/workflows/ci.yml/badge.svg)](https://github.com/PaperY0/wavelets-MoonBit/actions/workflows/ci.yml)
 [English below](#papery0wavelets-en)
 
 ## 为什么是它
@@ -80,6 +81,17 @@ moon run cmd/main -- threshold soft 2 -3 -2 -1 0 1 2 3
 moon run cmd/main -- pad antisymmetric 4 4 1 2 3
 ```
 
+### 安装与可运行示例
+
+```bash
+moon add PaperY0/wavelets@0.1.0     # 从 mooncakes 安装
+moon run examples/denoise           # 1D 小波软阈值去噪（打印去噪前后 MSE）
+moon run examples/cwt_timefreq      # CWT 时频分析（打印各尺度频率与幅值）
+```
+
+[`examples/`](examples/) 提供两个最小可运行样例（纯计算、只依赖公共 API）；
+`cmd/main` CLI 覆盖全部变换并输出 JSON，供 `tools/diff_test.py` 差分对拍。
+
 ## 与上游的刻意差异
 
 逐条见 [`docs/known-deviations.md`](docs/known-deviations.md)。要点：
@@ -132,6 +144,9 @@ python -m pip install --target tools/ref/pylibs -r tools/ref/requirements.txt
 python tools/gen_wavelets.py   # 重新生成 wavelet_data.mbt（滤波器系数）
 python tools/gen_golden.py     # 重新生成 golden_data_test.mbt + tools/golden.json
 python tools/diff_test.py      # CLI 对 PyWavelets 差分，重写 DIFF-REPORT.md
+# 发布到 mooncakes：先临时移走 tools/ref/pylibs（约 50MB 参考依赖，避免打包上传超限），
+# 发布完成后移回。pylibs 已在 .gitignore 中，不进入版本库。
+moon publish
 # 生成器产物需再跑一次 moon fmt
 ```
 
@@ -150,7 +165,8 @@ python tools/diff_test.py      # CLI 对 PyWavelets 差分，重写 DIFF-REPORT.
 ✅ 106 离散 + 10 实值连续小波，系数逐位一致 · ✅ 1D/2D DWT/IDWT、多层、CWT、wavefun、
 阈值化、9 延拓模式 · ✅ 43/43 测试（含 1771 黄金差分用例）· ✅ CLI 差分 1527/1527 一致 ·
 ✅ `moon check` 0 error · ✅ 纯计算无 IO，wasm/wasm-gc/js 三后端 ·
-✅ 安装：`moon add PaperY0/wavelets@0.1.0`。
+✅ CI：check/build/test 三后端 + 接口门禁 + 上游差分 · ✅ 两个可运行示例（`examples/`）·
+✅ 已发布 mooncakes：`moon add PaperY0/wavelets@0.1.0`。
 
 ---
 

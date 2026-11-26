@@ -40,3 +40,6 @@ for the deliberate differences from upstream.
   `moon coverage analyze > uncovered.log` to inspect uncovered lines.
 - After regenerating data modules, run `moon fmt` again (generators are not
   guaranteed fmt-clean).
+- `moon publish` packs the working directory (not just git-tracked files), so the
+  ~50MB `tools/ref/pylibs` reference install must be moved out of the module
+  temporarily before publishing and restored afterwards.
