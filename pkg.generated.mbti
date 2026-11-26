@@ -1,0 +1,206 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "PaperY0/wavelets"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn central_frequency(Wavelet, precision? : Int32) -> Double raise WaveletError
+
+pub fn cwt(Array[Double], Array[Double], Wavelet, sampling_period? : Double, precision? : Int32) -> (Matrix, Array[Double]) raise WaveletError
+
+pub fn downcoef(CoeffPart, Array[Double], Wavelet, mode? : Mode, level? : Int32) -> Array[Double] raise WaveletError
+
+pub fn dwt(Array[Double], Wavelet, mode? : Mode) -> (Array[Double], Array[Double]) raise WaveletError
+
+pub fn dwt2(Matrix, Wavelet, mode? : Mode) -> Coeffs2 raise WaveletError
+
+pub fn dwt_coeff_len(Int32, Int32, Mode) -> Int32
+
+pub fn dwt_max_level(Int32, Int32) -> Int32 raise WaveletError
+
+pub fn families() -> Array[String]
+
+pub fn frequency2scale(Wavelet, Double, precision? : Int32) -> Double raise WaveletError
+
+pub fn idwt(Array[Double]?, Array[Double]?, Wavelet, mode? : Mode) -> Array[Double] raise WaveletError
+
+pub fn idwt2(Coeffs2, Wavelet, mode? : Mode) -> Matrix raise WaveletError
+
+pub fn integrate_wavelet(Wavelet, precision? : Int32) -> (Array[Double], Array[Double]) raise WaveletError
+
+pub fn orthogonal_filter_bank(Array[Double]) -> (Array[Double], Array[Double], Array[Double], Array[Double]) raise WaveletError
+
+pub fn pad(Array[Double], Int32, Int32, Mode) -> Array[Double] raise WaveletError
+
+pub fn qmf(Array[Double]) -> Array[Double]
+
+pub fn scale2frequency(Wavelet, Double, precision? : Int32) -> Double raise WaveletError
+
+pub fn threshold(Array[Double], Double, mode? : ThresholdMode, substitute? : Double) -> Array[Double] raise WaveletError
+
+pub fn upcoef(CoeffPart, Array[Double], Wavelet, level? : Int32, take? : Int32) -> Array[Double] raise WaveletError
+
+pub fn wavedec(Array[Double], Wavelet, mode? : Mode, level? : Int32?) -> Array[Array[Double]] raise WaveletError
+
+pub fn wavedec2(Matrix, Wavelet, mode? : Mode, level? : Int32?) -> Decomposition2 raise WaveletError
+
+pub fn wavelist(kind? : WaveletKind?) -> Array[String]
+
+pub fn waverec(Array[Array[Double]], Wavelet, mode? : Mode) -> Array[Double] raise WaveletError
+
+pub fn waverec2(Decomposition2, Wavelet, mode? : Mode) -> Matrix raise WaveletError
+
+pub fn wmaxlev(Int32, Wavelet) -> Int32 raise WaveletError
+
+// Errors
+#derive(Show, @debug.Debug)
+pub(all) suberror WaveletError {
+  UnknownWavelet(String)
+  NotDiscrete(String)
+  NotContinuous(String)
+  InvalidMode(String)
+  InvalidArgument(String)
+  InvalidLevel(String)
+  ShapeMismatch(String)
+  NotSupported(String)
+}
+
+// Types and methods
+#derive(Eq, @debug.Debug)
+pub(all) enum CoeffPart {
+  Approx
+  Detail
+}
+
+#derive(Eq, @debug.Debug)
+pub struct Coeffs2 {
+  approx : Matrix?
+  horizontal : Matrix?
+  vertical : Matrix?
+  diagonal : Matrix?
+}
+pub fn Coeffs2::equal(Self, Self) -> Bool
+pub fn Coeffs2::not_equal(Self, Self) -> Bool
+pub fn Coeffs2::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub struct Decomposition2 {
+  approx : Matrix
+  details : Array[Detail2]
+}
+pub fn Decomposition2::equal(Self, Self) -> Bool
+pub fn Decomposition2::not_equal(Self, Self) -> Bool
+pub fn Decomposition2::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub struct Detail2 {
+  horizontal : Matrix
+  vertical : Matrix
+  diagonal : Matrix
+}
+pub fn Detail2::equal(Self, Self) -> Bool
+pub fn Detail2::not_equal(Self, Self) -> Bool
+pub fn Detail2::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub struct Matrix {
+  rows : Int32
+  cols : Int32
+  data : Array[Double]
+}
+pub fn Matrix::col(Self, Int32) -> Array[Double]
+pub fn Matrix::equal(Self, Self) -> Bool
+pub fn Matrix::from_rows(Array[Array[Double]]) -> Self raise WaveletError
+pub fn Matrix::get(Self, Int32, Int32) -> Double
+pub fn Matrix::new(Int32, Int32, Array[Double]) -> Self raise WaveletError
+pub fn Matrix::not_equal(Self, Self) -> Bool
+pub fn Matrix::row(Self, Int32) -> Array[Double]
+pub fn Matrix::shape(Self) -> (Int32, Int32)
+pub fn Matrix::to_repr(Self) -> @debug.Repr
+pub fn Matrix::to_rows(Self) -> Array[Array[Double]]
+pub fn Matrix::zeros(Int32, Int32) -> Self raise WaveletError
+
+#derive(Eq, @debug.Debug)
+pub(all) enum Mode {
+  Zero
+  Constant
+  Symmetric
+  Periodic
+  Smooth
+  Periodization
+  Reflect
+  AntiSymmetric
+  AntiReflect
+}
+pub fn Mode::name(Self) -> String
+pub fn Mode::parse(String) -> Self raise WaveletError
+
+#derive(Eq, @debug.Debug)
+pub(all) enum Symmetry {
+  Asymmetric
+  NearSymmetric
+  Symmetric
+  AntiSymmetric
+}
+pub fn Symmetry::name(Self) -> String
+
+#derive(Eq, @debug.Debug)
+pub(all) enum ThresholdMode {
+  Soft
+  Hard
+  Greater
+  Less
+  Garrote
+}
+
+#derive(Eq, @debug.Debug)
+pub struct Wavefun {
+  phi : Array[Double]?
+  psi : Array[Double]
+  phi_r : Array[Double]?
+  psi_r : Array[Double]?
+  x : Array[Double]
+}
+pub fn Wavefun::equal(Self, Self) -> Bool
+pub fn Wavefun::not_equal(Self, Self) -> Bool
+pub fn Wavefun::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub struct Wavelet {
+  name : String
+  family_name : String
+  short_name : String
+  kind : WaveletKind
+  dec_lo : Array[Double]
+  dec_hi : Array[Double]
+  rec_lo : Array[Double]
+  rec_hi : Array[Double]
+  orthogonal : Bool
+  biorthogonal : Bool
+  symmetry : Symmetry
+  vm_psi : Int32
+  vm_phi : Int32
+  lower_bound : Double
+  upper_bound : Double
+}
+pub fn Wavelet::dec_len(Self) -> Int32
+pub fn Wavelet::equal(Self, Self) -> Bool
+pub fn Wavelet::filter_bank(Self) -> (Array[Double], Array[Double], Array[Double], Array[Double])
+pub fn Wavelet::inverse_filter_bank(Self) -> (Array[Double], Array[Double], Array[Double], Array[Double])
+pub fn Wavelet::new(String) -> Self raise WaveletError
+pub fn Wavelet::not_equal(Self, Self) -> Bool
+pub fn Wavelet::rec_len(Self) -> Int32
+pub fn Wavelet::to_repr(Self) -> @debug.Repr
+pub fn Wavelet::wavefun(Self, level? : Int32) -> Wavefun raise WaveletError
+
+#derive(Eq, Show, @debug.Debug)
+pub(all) enum WaveletKind {
+  Discrete
+  Continuous
+}
+
+// Type aliases
+
+// Traits
