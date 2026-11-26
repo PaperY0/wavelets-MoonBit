@@ -72,6 +72,9 @@ def sig(n, seed=0):
 
 
 def main():
+    import inspect
+    print("pywt", pywt.__version__, pywt.__file__, flush=True)
+    _cwt_has_precision = "precision" in inspect.signature(pywt.cwt).parameters
     # Warm up the build so per-case `moon run` only executes the cached artifact.
     subprocess.run(["moon", "build", "cmd/main"], cwd=ROOT,
                    capture_output=True, text=True)
@@ -106,7 +109,10 @@ def main():
     for w in CW:
         for scales in [[1.0, 2.0, 4.0, 8.0], [1.0, 3.0, 7.0]]:
             for x in [chirp, sig(16)]:
-                coefs, freqs = pywt.cwt(x, scales, w, sampling_period=1.0, precision=12)
+                cwt_kw = {"sampling_period": 1.0}
+                if _cwt_has_precision:
+                    cwt_kw["precision"] = 12
+                coefs, freqs = pywt.cwt(x, scales, w, **cwt_kw)
                 got = cli("cwt", w, ",".join(repr(s) for s in scales),
                           *[repr(float(v)) for v in x])
                 check(f"cwt {w}/{scales} coefs", np.array(got["coefs"], dtype=float), coefs)
